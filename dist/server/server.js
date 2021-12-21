@@ -6,6 +6,7 @@ import * as socketIO from "socket.io";
 import http from 'http';
 import dotenv from "dotenv";
 import path from 'path';
+import { RestoAdminModel } from "./schemas/restoAdmin.schema.js";
 dotenv.config();
 const __dirname = path.resolve();
 const app = express();
@@ -17,7 +18,8 @@ const io = new socketIO.Server(server, { cors: {
     } });
 const PORT = process.env.PORT || 3000;
 mongoose
-    .connect(`${process.env.MONGO_URI}`)
+    // .connect(`${process.env.MONGO_URI}`)
+    .connect('mongodb://localhost:27017/grub-hub-by-chelle')
     .then(() => {
     console.log("Connected to DB Successfully");
 })
@@ -30,6 +32,15 @@ app.use(cors({
 app.use(express.json());
 app.get("/api/test", function (req, res) {
     res.json({ message: "Hello World!" });
+});
+app.get("/api/RestoAdmin", function (req, res) {
+    RestoAdminModel.find()
+        .then(data => {
+        res.json(data);
+    })
+        .catch(err => {
+        res.status(501).json({ error: err });
+    });
 });
 app.all("/api/*", function (req, res) {
     res.sendStatus(404);
