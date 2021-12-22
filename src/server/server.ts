@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import mongoose from "mongoose";
+import mongoose, { model } from "mongoose";
 import cookieParser from "cookie-parser";
 import * as socketIO from "socket.io";
 import http from 'http';
@@ -8,6 +8,7 @@ import dotenv from "dotenv";
 import path from 'path';
 
 import { RestoAdminModel } from "./schemas/restoAdmin.schema.js";
+import type { RestoAdmin } from '../shared/models/restoAdmin.model.js';
 
 dotenv.config();
 
@@ -52,7 +53,30 @@ app.get("/api/RestoAdmin", function (req, res){
   .catch(err => {
     res.status(501).json({error: err})
   })
+});
+
+app.post("/api/create-resto-admin-account",  function (req,res){
+  const { restoName, firstName, lastName, email, password} = req.body;
+  
+  const restoAdmin = new RestoAdminModel({ restoName });
+
+  restoAdmin.adminInfo = {
+    firstName: firstName,
+    lastName: lastName,
+    email: email,
+    password: password
+  }
+
+  restoAdmin.save()
+  .then (data => {
+    res.json({data});
+    console.log(data)
+  })
+  .catch(err => {
+    res.status(401).json({error: err})
+  })
 })
+
 
 app.all("/api/*", function (req, res) {
   res.sendStatus(404);

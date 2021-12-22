@@ -42,6 +42,24 @@ app.get("/api/RestoAdmin", function (req, res) {
         res.status(501).json({ error: err });
     });
 });
+app.post("/api/create-resto-admin-account", function (req, res) {
+    const { restoName, firstName, lastName, email, password } = req.body;
+    const restoAdmin = new RestoAdminModel({ restoName });
+    restoAdmin.adminInfo = {
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        password: password
+    };
+    restoAdmin.save()
+        .then(data => {
+        res.json({ data });
+        console.log(data);
+    })
+        .catch(err => {
+        res.status(401).json({ error: err });
+    });
+});
 app.all("/api/*", function (req, res) {
     res.sendStatus(404);
 });
