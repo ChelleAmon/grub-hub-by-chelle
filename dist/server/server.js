@@ -1,17 +1,21 @@
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
+import 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import cookieParser from "cookie-parser";
 import * as socketIO from "socket.io";
 import http from 'http';
 import dotenv from "dotenv";
 import path from 'path';
 import { RestoAdminModel } from "./schemas/restoAdmin.schema.js";
+import { authHandler } from "./middleware/auth.middleware.js";
 dotenv.config();
 const __dirname = path.resolve();
 const app = express();
 const server = http.createServer(app);
 const clientPath = path.join(__dirname, '/dist/client');
+const saltRounds = 10;
 app.use(express.static(clientPath));
 const io = new socketIO.Server(server, { cors: {
         origin: '*'
@@ -33,7 +37,7 @@ app.use(express.json());
 app.get("/api/test", function (req, res) {
     res.json({ message: "Hello World!" });
 });
-app.get("/api/RestoAdmin", function (req, res) {
+app.get("/api/admin/RestoAdmin", authHandler, function (req, res) {
     RestoAdminModel.find()
         .then(data => {
         res.json(data);
@@ -42,22 +46,26 @@ app.get("/api/RestoAdmin", function (req, res) {
         res.status(501).json({ error: err });
     });
 });
-app.post("/api/create-resto-admin-account", function (req, res) {
+app.post("/api/admin/RestoAdmin", function (req, res) {
     const { restoName, firstName, lastName, email, password } = req.body;
-    const restoAdmin = new RestoAdminModel({ restoName });
-    restoAdmin.adminInfo = {
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        password: password
-    };
-    restoAdmin.save()
-        .then(data => {
-        res.json({ data });
-        console.log(data);
-    })
-        .catch(err => {
-        res.status(401).json({ error: err });
+    bcrypt.genSalt(saltRounds, function (err, salt) {
+        bcrypt.hash(password, salt, function (err, hash) {
+            const restoAdmin = new RestoAdminModel({ restoName });
+            restoAdmin.adminInfo = {
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                password: hash
+            };
+            restoAdmin.save()
+                .then(data => {
+                res.json({ data });
+                console.log(data);
+            })
+                .catch(err => {
+                res.status(401).json({ error: err });
+            });
+        });
     });
 });
 app.all("/api/*", function (req, res) {
