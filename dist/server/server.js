@@ -70,7 +70,15 @@ app.post("/api/admin/RestoAdmin", async function (req, res) {
                     res.json({ data });
                 })
                     .catch(err => {
-                    res.status(401).json({ error: err });
+                    if (err.name === "ValidationError") {
+                        let errors = {};
+                        Object.keys(err.errors).forEach((key) => {
+                            err[key] = err.errors[key].message;
+                            errors = (err[key]);
+                        });
+                        return res.status(400).send({ Error: errors });
+                    }
+                    res.status(500).json({ message: "Something went wrong" });
                 });
             });
         });
