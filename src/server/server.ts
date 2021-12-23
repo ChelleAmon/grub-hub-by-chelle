@@ -10,6 +10,7 @@ import dotenv from "dotenv";
 import path from 'path';
 
 import { RestoAdminModel } from "./schemas/restoAdmin.schema.js";
+import { authHandler } from "./middleware/auth.middleware.js";
 
 
 dotenv.config();
@@ -48,7 +49,7 @@ app.get("/api/test", function (req, res) {
 });
 
 
-app.get("/api/RestoAdmin", function (req, res){
+app.get("/api/admin/RestoAdmin", function (req: any, res){
   RestoAdminModel.find()
   .then(data => {
     res.json(data)
@@ -58,7 +59,7 @@ app.get("/api/RestoAdmin", function (req, res){
   })
 });
 
-app.post("/api/create-resto-admin-account",  function (req,res){
+app.post("/api/admin/RestoAdmin",  function (req,res){
   const { restoName, firstName, lastName, email, password} = req.body;
 
   bcrypt.genSalt(saltRounds, function(err, salt){
