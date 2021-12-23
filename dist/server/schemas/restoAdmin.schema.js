@@ -23,11 +23,13 @@ const adminInfoSchema = new Schema({
             message: (props) => `${props.value} is not a valid email!`
         } },
     password: { type: String, required: true, minlength: 5 },
+    isAdmin: { type: Boolean }
 });
 const restoAdminSchema = new Schema({
     restoName: { type: String, required: true },
     storeNumber: { type: String, required: true },
-    adminInfo: adminInfoSchema
+    adminInfo: adminInfoSchema,
+    timestamp: { type: Date }
 });
 export const RestoAdminModel = model('RestoAdmin', restoAdminSchema);
 //# sourceMappingURL=restoAdmin.schema.js.map

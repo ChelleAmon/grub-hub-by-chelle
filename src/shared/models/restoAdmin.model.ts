@@ -1,3 +1,5 @@
+import { Date } from "mongoose";
+
 export interface RestoAdmin{
     restoName: string,
     storeNumber: string,
@@ -17,6 +19,8 @@ export interface RestoAdmin{
         firstName: string,
         lastName: string,
         email: string,
-        password: string
+        password: string,
+        isAdmin: boolean
     }
+    timestamp: Date
 }

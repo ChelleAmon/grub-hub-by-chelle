@@ -47,7 +47,7 @@ app.get("/api/admin/RestoAdmin", function (req, res) {
     });
 });
 app.post("/api/admin/RestoAdmin", async function (req, res) {
-    const { restoName, storeNumber, firstName, lastName, email, password } = req.body;
+    const { restoName, storeNumber, firstName, lastName, email, password, isAdmin, timestamp } = req.body;
     const isStoreNumberUnique = await RestoAdminModel.findOne({ storeNumber }).lean();
     if (isStoreNumberUnique) {
         res.status(302).send(`Found ${storeNumber} on file. Please check with your administrator for some assistance.`);
@@ -58,12 +58,18 @@ app.post("/api/admin/RestoAdmin", async function (req, res) {
     else {
         bcrypt.genSalt(saltRounds, function (err, salt) {
             bcrypt.hash(password, salt, function (err, hash) {
-                const restoAdmin = new RestoAdminModel({ restoName, storeNumber });
+                const restoAdmin = new RestoAdminModel({
+                    restoName,
+                    storeNumber,
+                    isAdmin,
+                    timestamp: Date.now()
+                });
                 restoAdmin.adminInfo = {
                     firstName: firstName,
                     lastName: lastName,
                     email: email,
-                    password: hash
+                    password: hash,
+                    isAdmin: true
                 };
                 restoAdmin.save()
                     .then(data => {
