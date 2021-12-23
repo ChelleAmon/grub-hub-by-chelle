@@ -9,7 +9,7 @@ import http from 'http';
 import dotenv from "dotenv";
 import path from 'path';
 import { RestoAdminModel } from "./schemas/restoAdmin.schema.js";
-import { authHandler } from "./middleware/auth.middleware.js";
+import "./middleware/auth.middleware.js";
 dotenv.config();
 const __dirname = path.resolve();
 const app = express();
@@ -37,8 +37,8 @@ app.use(express.json());
 app.get("/api/test", function (req, res) {
     res.json({ message: "Hello World!" });
 });
-app.get("/api/admin/RestoAdmin", authHandler, function (req, res) {
-    RestoAdminModel.find()
+app.get("/api/admin/RestoAdmin", function (req, res) {
+    RestoAdminModel.findOne({ storeNumber: req.body.storeNumber }, "-password")
         .then(data => {
         res.json(data);
     })
@@ -46,27 +46,49 @@ app.get("/api/admin/RestoAdmin", authHandler, function (req, res) {
         res.status(501).json({ error: err });
     });
 });
-app.post("/api/admin/RestoAdmin", function (req, res) {
-    const { restoName, firstName, lastName, email, password } = req.body;
-    bcrypt.genSalt(saltRounds, function (err, salt) {
-        bcrypt.hash(password, salt, function (err, hash) {
-            const restoAdmin = new RestoAdminModel({ restoName });
-            restoAdmin.adminInfo = {
-                firstName: firstName,
-                lastName: lastName,
-                email: email,
-                password: hash
-            };
-            restoAdmin.save()
-                .then(data => {
-                res.json({ data });
-                console.log(data);
-            })
-                .catch(err => {
-                res.status(401).json({ error: err });
+app.post("/api/admin/RestoAdmin", async function (req, res) {
+    const { restoName, storeNumber, firstName, lastName, email, password, isAdmin, timestamp } = req.body;
+    const isStoreNumberUnique = await RestoAdminModel.findOne({ storeNumber }).lean();
+    if (isStoreNumberUnique) {
+        res.status(302).send(`Found ${storeNumber} on file. Please check with your administrator for some assistance.`);
+    }
+    else if (restoName == "" || storeNumber == "" || firstName == "" || lastName == "" || email == "" || password == "") {
+        res.send('Fill up all required fields!');
+    }
+    else {
+        bcrypt.genSalt(saltRounds, function (err, salt) {
+            bcrypt.hash(password, salt, function (err, hash) {
+                const restoAdmin = new RestoAdminModel({
+                    restoName,
+                    storeNumber,
+                    isAdmin,
+                    timestamp: Date.now()
+                });
+                restoAdmin.adminInfo = {
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    password: hash,
+                    isAdmin: true
+                };
+                restoAdmin.save()
+                    .then(data => {
+                    res.json({ data });
+                })
+                    .catch(err => {
+                    if (err.name === "ValidationError") {
+                        let errors = {};
+                        Object.keys(err.errors).forEach((key) => {
+                            err[key] = err.errors[key].message;
+                            errors = (err[key]);
+                        });
+                        return res.status(400).send({ Error: errors });
+                    }
+                    res.status(500).json({ message: "Something went wrong" });
+                });
             });
         });
-    });
+    }
 });
 app.all("/api/*", function (req, res) {
     res.sendStatus(404);
