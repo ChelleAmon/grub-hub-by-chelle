@@ -20,6 +20,7 @@ const app = express();
 const server = http.createServer(app);
 const clientPath = path.join(__dirname, '/dist/client');
 const saltRounds = 10;
+const access_token = process.env.ACCESS_TOKEN_SECRET as string;
 app.use(express.static(clientPath));
 
 const io = new socketIO.Server(server,  { cors: {
@@ -49,8 +50,8 @@ app.get("/api/test", function (req, res) {
 });
 
 
-app.get("/api/admin/RestoAdmin", function (req: any, res){
-  RestoAdminModel.findOne({storeNumber: req.body.storeNumber}, "-password")
+app.get("/api/admin/RestoAdmin", authHandler, function (req: any, res){
+  RestoAdminModel.find({}, "-password")
   .then(data => {
     res.json(data)
   })
@@ -106,6 +107,31 @@ app.post("/api/admin/RestoAdmin",  async function (req,res){
       })
     })
   }
+});
+
+
+app.post("/api/admin/login", function (req,res,next){
+  const { storeNumber, email, password } = req.body;
+
+  RestoAdminModel.findOne({storeNumber: storeNumber, "adminInfo.email": email})
+  .then(admin => {
+    bcrypt.compare(password, `${admin?.adminInfo.password}`, function(err, result){
+      if (result && admin?.adminInfo.isAdmin == true ){
+        const accessToken = jwt.sign({admin}, access_token, )
+        res.cookie('jwt', accessToken, {
+          httpOnly: true,
+          maxAge: 60 * 60 * 100,
+          path: "/api/admin"
+        })
+        res.status(200).send({message: "Successfully logged in"})
+      }else{
+        res.status(403).send({message: "Either Store number, email or password is incorrect"})
+      }
+    })
+  })
+  .catch(err => {
+    res.status(501).send({Error: "Something went wrong"})
+  })
 })
 
 
