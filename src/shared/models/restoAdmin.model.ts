@@ -1,7 +1,7 @@
 export interface RestoAdmin{
     restoName: string,
+    storeNumber: string,
     restoAddress?: {
-        storeNumber: string,
         restoAddress1: string,
         restoAddress2?: string,
         city: string,

@@ -8,6 +8,7 @@ const adminInfoSchema = new Schema({
 });
 const restoAdminSchema = new Schema({
     restoName: String,
+    storeNumber: String,
     adminInfo: adminInfoSchema
 });
 export const RestoAdminModel = model('RestoAdmin', restoAdminSchema);

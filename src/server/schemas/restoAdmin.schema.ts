@@ -12,6 +12,7 @@ const adminInfoSchema = new Schema({
 
 const restoAdminSchema = new Schema<RestoAdmin>({
     restoName: String, 
+    storeNumber: String,
     adminInfo: adminInfoSchema
 })
 
