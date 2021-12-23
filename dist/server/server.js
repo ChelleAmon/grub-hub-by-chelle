@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
-import 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import cookieParser from "cookie-parser";
 import * as socketIO from "socket.io";
@@ -9,13 +9,14 @@ import http from 'http';
 import dotenv from "dotenv";
 import path from 'path';
 import { RestoAdminModel } from "./schemas/restoAdmin.schema.js";
-import "./middleware/auth.middleware.js";
+import { authHandler } from "./middleware/auth.middleware.js";
 dotenv.config();
 const __dirname = path.resolve();
 const app = express();
 const server = http.createServer(app);
 const clientPath = path.join(__dirname, '/dist/client');
 const saltRounds = 10;
+const access_token = process.env.ACCESS_TOKEN_SECRET;
 app.use(express.static(clientPath));
 const io = new socketIO.Server(server, { cors: {
         origin: '*'
@@ -37,8 +38,8 @@ app.use(express.json());
 app.get("/api/test", function (req, res) {
     res.json({ message: "Hello World!" });
 });
-app.get("/api/admin/RestoAdmin", function (req, res) {
-    RestoAdminModel.findOne({ storeNumber: req.body.storeNumber }, "-password")
+app.get("/api/admin/RestoAdmin", authHandler, function (req, res) {
+    RestoAdminModel.find({}, "-password")
         .then(data => {
         res.json(data);
     })
@@ -89,6 +90,29 @@ app.post("/api/admin/RestoAdmin", async function (req, res) {
             });
         });
     }
+});
+app.post("/api/admin/login", function (req, res, next) {
+    const { storeNumber, email, password } = req.body;
+    RestoAdminModel.findOne({ storeNumber: storeNumber, "adminInfo.email": email })
+        .then(admin => {
+        bcrypt.compare(password, `${admin?.adminInfo.password}`, function (err, result) {
+            if (result && admin?.adminInfo.isAdmin == true) {
+                const accessToken = jwt.sign({ admin }, access_token);
+                res.cookie('jwt', accessToken, {
+                    httpOnly: true,
+                    maxAge: 60 * 60 * 100,
+                    path: "/api/admin"
+                });
+                res.status(200).send({ message: "Successfully logged in" });
+            }
+            else {
+                res.status(403).send({ message: "Either Store number, email or password is incorrect" });
+            }
+        });
+    })
+        .catch(err => {
+        res.status(501).send({ Error: "Something went wrong" });
+    });
 });
 app.all("/api/*", function (req, res) {
     res.sendStatus(404);

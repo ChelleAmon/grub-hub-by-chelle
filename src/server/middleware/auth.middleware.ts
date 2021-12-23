@@ -1,13 +1,12 @@
 import { NextFunction, Request, RequestHandler, Response } from "express";
 import jwt from "jsonwebtoken";
-import { User } from "../../shared/models/user.model.js";
+import { RestoAdmin } from "../../shared/models/restoAdmin.model.js";
 
 interface AuthRequest extends Request {
-  user?: User;
+  restoAdmin?: RestoAdmin;
 }
 function authHandle(req: AuthRequest, res: Response, next: NextFunction) {
   const cookie = req.cookies["jwt"];
-  console.log("auth", cookie);
   jwt.verify(
     cookie,
     process.env.ACCESS_TOKEN_SECRET as string,
@@ -16,8 +15,7 @@ function authHandle(req: AuthRequest, res: Response, next: NextFunction) {
         return res.sendStatus(403);
       }
       if (result) {
-          console.log(result.user, 'this is the user');
-        req.user = result.user;
+        req.restoAdmin = result.restoAdmin;
       }
       next();
     }
