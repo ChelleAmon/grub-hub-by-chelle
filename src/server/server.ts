@@ -5,7 +5,6 @@ import * as socketIO from "socket.io";
 import http from 'http';
 import dotenv from "dotenv";
 import path from 'path';
-
 import { getRestoAdmin, loginRestoAdmin, postRestoAdmin } from "./routes/restoAdmin.routes.js";
 
 dotenv.config();
@@ -39,9 +38,9 @@ app.use(cors({
 
 
 app.use(express.json());
-app.use(getRestoAdmin);
-app.use(postRestoAdmin);
-app.use(loginRestoAdmin);
+app.use('/api/admin', getRestoAdmin);
+app.use('/api/admin', postRestoAdmin);
+app.use('/api/admin', loginRestoAdmin);
 
 
 app.all("/api/*", function (req, res) {

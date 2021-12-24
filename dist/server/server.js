@@ -28,9 +28,9 @@ app.use(cors({
     origin: ['http://localhost:3000', 'http://localhost:4200', 'http://localhost:3501', 'http://localhost:8080']
 }));
 app.use(express.json());
-app.use(getRestoAdmin);
-app.use(postRestoAdmin);
-app.use(loginRestoAdmin);
+app.use('/api/admin', getRestoAdmin);
+app.use('/api/admin', postRestoAdmin);
+app.use('/api/admin', loginRestoAdmin);
 app.all("/api/*", function (req, res) {
     res.sendStatus(404);
 });
