@@ -15,6 +15,7 @@ const menuSchema = new Schema({
 
 const inventorySchema = new Schema<Inventory>({
     menu: menuSchema,
+    restoAdmin: {type: mongoose.Types.ObjectId, ref: "RestoAdmin"}
 });
 
 
