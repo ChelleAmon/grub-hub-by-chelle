@@ -2,15 +2,15 @@ import { Date } from "mongoose";
 import * as mongoose from "mongoose";
 import { RestoAdmin } from "./restoAdmin.model";
 
-export interface Inventory {
-    menu: {
-        name: string,
+export interface Menu {
+    name: string,
+    inventory: {
         imgUrl?: string, 
         description: string,
         price: number,
         quantity: number,
         isAvailable: boolean,
-        dateCreated: Date
+        dateCreated: Date,
+        restoAdmin?: {type: mongoose.Types.ObjectId | RestoAdmin}
     }
-    restoAdmin?: {type: mongoose.Types.ObjectId | RestoAdmin}
 }

@@ -1,5 +1,5 @@
 import * as mongoose from "mongoose";
-import { Inventory } from "./inventory.model";
+import { Inventory } from "./menu.model";
 
 export interface RestoAdmin{
     restoName: string,
