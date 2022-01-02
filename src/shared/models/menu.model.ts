@@ -1,6 +1,6 @@
 import { Date } from "mongoose";
 import * as mongoose from "mongoose";
-import { RestoAdmin } from "./restoAdmin.model";
+import { RestoAdmin } from "./restoAdmin.model.js";
 
 export interface Menu {
     name: string,
