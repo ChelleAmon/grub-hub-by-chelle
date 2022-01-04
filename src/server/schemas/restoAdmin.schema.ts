@@ -34,7 +34,7 @@ const restoAdminSchema = new Schema<RestoAdmin>({
     storeNumber: {type: String, required: true},
     adminInfo: adminInfoSchema,
     timestamp: {type: Date},
-    inventories: [{type: mongoose.Types.ObjectId, ref: "Inventory"}]
+    inventories: [{type: mongoose.Types.ObjectId, ref: "Menu"}]
 })
 
 

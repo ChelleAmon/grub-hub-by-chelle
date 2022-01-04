@@ -1,4 +1,5 @@
 import express from 'express';
+import { isValidObjectId } from 'mongoose';
 import { menuModel } from '../schemas/menu.schema.js';
 import { RestoAdminModel } from '../schemas/restoAdmin.schema.js';
 
@@ -31,6 +32,7 @@ export function addMenuByAdmin(req: any, res: any) {
             quantity,
             isAvailable: true,
             dateCreated: Date.now(),
+            restoAdmin: admin
         });
 
         menu
