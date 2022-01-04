@@ -19,21 +19,40 @@ export function getRestoAdminFn(req, res) {
     });
 }
 export async function addRestoAdminFn(req, res) {
-    const { restoName, storeNumber, firstName, lastName, email, password, isAdmin, timestamp } = req.body;
-    const isStoreNumberUnique = await RestoAdminModel.findOne({ storeNumber }).lean();
+    const { restoName, storeNumber, firstName, lastName, email, password, isAdmin, timestamp, } = req.body;
+    const isStoreNumberUnique = await RestoAdminModel.findOne({
+        storeNumber,
+    }).lean();
     if (isStoreNumberUnique) {
         res
             .status(302)
             .send(`Found ${storeNumber} on file. Please check with your administrator for some assistance.`);
     }
-    else if (restoName == '' || storeNumber == '' || firstName == '' || lastName == '' || email == '' || password == '') {
+    else if (restoName == '' ||
+        storeNumber == '' ||
+        firstName == '' ||
+        lastName == '' ||
+        email == '' ||
+        password == '') {
         res.send('Fill up all required fields!');
     }
     else {
         bcrypt.genSalt(saltRounds, function (err, salt) {
             bcrypt.hash(password, salt, function (err, hash) {
-                const restoAdmin = new RestoAdminModel({ restoName, storeNumber, isAdmin, timestamp: Date.now() });
-                restoAdmin.adminInfo = { firstName: firstName, lastName: lastName, email: email, password: hash, isAdmin: true };
+                const restoAdmin = new RestoAdminModel({
+                    restoName,
+                    storeNumber,
+                    inventories: [],
+                    isAdmin,
+                    timestamp: Date.now(),
+                });
+                restoAdmin.adminInfo = {
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    password: hash,
+                    isAdmin: true,
+                };
                 restoAdmin
                     .save()
                     .then((data) => {
@@ -74,9 +93,7 @@ export function loginRestoAdminFn(req, res) {
                 res.status(200).send({ message: 'Successfully logged in' });
             }
             else {
-                res
-                    .status(403)
-                    .send({
+                res.status(403).send({
                     message: 'Either Store number, email or password is incorrect',
                 });
             }

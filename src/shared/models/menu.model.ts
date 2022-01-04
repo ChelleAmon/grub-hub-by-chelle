@@ -4,13 +4,12 @@ import { RestoAdmin } from "./restoAdmin.model.js";
 
 export interface Menu {
     name: string,
-    inventory: {
-        imgUrl?: string, 
-        description: string,
-        price: number,
-        quantity: number,
-        isAvailable: boolean,
-        dateCreated: Date,
-        restoAdmin?: {type: mongoose.Types.ObjectId | RestoAdmin}
-    }
+    imgUrl: string, 
+    description: string,
+    price: number,
+    quantity: number,
+    isAvailable: boolean,
+    dateCreated: Date,
+    restoAdmin?: {type: mongoose.Types.ObjectId | RestoAdmin}
+    
 }
