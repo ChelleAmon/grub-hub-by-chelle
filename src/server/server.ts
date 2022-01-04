@@ -6,6 +6,7 @@ import http from 'http';
 import dotenv from "dotenv";
 import path from 'path';
 import { getRestoAdmin, loginRestoAdmin, postRestoAdmin } from "./routes/restoAdmin.routes.js";
+import { getMenusByAdminId, postMenu } from "./routes/menu.routes.js";
 
 dotenv.config();
 
@@ -41,6 +42,8 @@ app.use(express.json());
 app.use('/api/admin', getRestoAdmin);
 app.use('/api/admin', postRestoAdmin);
 app.use('/api/admin', loginRestoAdmin);
+app.use('/api/admin', getMenusByAdminId);
+app.use('/api/admin', postMenu);
 
 
 app.all("/api/*", function (req, res) {

@@ -24,9 +24,20 @@ export function getRestoAdminFn(req: any, res: any) {
 }
 
 export async function addRestoAdminFn(req: any, res: any) {
-	const { restoName, storeNumber, firstName, lastName, email, password, isAdmin, timestamp } = req.body;
+	const {
+		restoName,
+		storeNumber,
+		firstName,
+		lastName,
+		email,
+		password,
+		isAdmin,
+		timestamp,
+	} = req.body;
 
-	const isStoreNumberUnique = await RestoAdminModel.findOne({storeNumber}).lean();
+	const isStoreNumberUnique = await RestoAdminModel.findOne({
+		storeNumber,
+	}).lean();
 
 	if (isStoreNumberUnique) {
 		res
@@ -35,14 +46,32 @@ export async function addRestoAdminFn(req: any, res: any) {
 				`Found ${storeNumber} on file. Please check with your administrator for some assistance.`
 			);
 	} else if (
-		restoName == '' || storeNumber == '' || firstName == '' || lastName == '' || email == '' || password == '' ) {
+		restoName == '' ||
+		storeNumber == '' ||
+		firstName == '' ||
+		lastName == '' ||
+		email == '' ||
+		password == ''
+	) {
 		res.send('Fill up all required fields!');
 	} else {
 		bcrypt.genSalt(saltRounds, function (err, salt) {
 			bcrypt.hash(password, salt, function (err, hash) {
-				const restoAdmin = new RestoAdminModel({ restoName, storeNumber, isAdmin, timestamp: Date.now() });
-				
-                restoAdmin.adminInfo = { firstName: firstName, lastName: lastName, email: email, password: hash, isAdmin: true };
+				const restoAdmin = new RestoAdminModel({
+					restoName,
+					storeNumber,
+					inventories: [],
+					isAdmin,
+					timestamp: Date.now(),
+				});
+
+				restoAdmin.adminInfo = {
+					firstName: firstName,
+					lastName: lastName,
+					email: email,
+					password: hash,
+					isAdmin: true,
+				};
 
 				restoAdmin
 					.save()
@@ -51,12 +80,12 @@ export async function addRestoAdminFn(req: any, res: any) {
 					})
 					.catch((err) => {
 						if (err.name === 'ValidationError') {
-                            let arr: any[]= [];
+							let arr: any[] = [];
 							let errors = {};
 							Object.keys(err.errors).forEach((key) => {
 								err[key] = err.errors[key].message;
 								errors = err[key];
-                                arr.push(errors)
+								arr.push(errors);
 							});
 							return res.status(400).send(arr);
 						}
@@ -88,11 +117,9 @@ export function loginRestoAdminFn(req: any, res: any) {
 						});
 						res.status(200).send({ message: 'Successfully logged in' });
 					} else {
-						res
-							.status(403)
-							.send({
-								message: 'Either Store number, email or password is incorrect',
-							});
+						res.status(403).send({
+							message: 'Either Store number, email or password is incorrect',
+						});
 					}
 				}
 			);
