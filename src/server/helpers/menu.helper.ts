@@ -1,21 +1,26 @@
 import express from 'express';
-import { isValidObjectId } from 'mongoose';
 import { menuModel } from '../schemas/menu.schema.js';
 import { RestoAdminModel } from '../schemas/restoAdmin.schema.js';
 
-// export function menusByAdminId(req: any, res: any) {
+export function menusByAdminId(req: any, res: any) {
 
-// 	RestoAdminModel
-// 		.find({_id: req.body._id})
-// 		.populate("menu")
-// 		.then((data) => {
-// 			res.json({ data });
-//             console.log({data})
-// 		})
-// 		.catch((err) => {
-// 			res.status(501).json({ error: err });
-// 		});
-// }
+	RestoAdminModel
+		.find({_id: req.params.adminId}, "-_id -timestamp")
+		.populate(
+            {
+            path: "inventories",
+            select: ['name', 'imgUrl', 'description', 'price'],
+            }
+
+        )
+		.then((data) => {
+			res.json({ data });
+            console.log({data})
+		})
+		.catch((err) => {
+			res.status(501).json({ error: err });
+		});
+}
 
 export function addMenuByAdmin(req: any, res: any) {
 	const { name, imgUrl, description, price, quantity} = req.body;
