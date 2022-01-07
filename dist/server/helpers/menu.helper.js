@@ -16,6 +16,7 @@ export function menusByAdminId(req, res) {
         res.status(501).json({ error: err });
     });
 }
+;
 export function addMenuByAdmin(req, res) {
     const { name, imgUrl, description, price, quantity } = req.body;
     const admin = req.params.adminId;
@@ -44,6 +45,23 @@ export function addMenuByAdmin(req, res) {
             console.log(err, "menu failed");
             return res.status(500);
         });
+    });
+}
+;
+export function updateMenuByAdmin(req, res) {
+    const menuId = req.params.menuId;
+    const { name, imgUrl, description, price, quantity } = req.body;
+    menuModel.findByIdAndUpdate(menuId, {
+        $set: { name: name, imgUrl: imgUrl, description: description, price: price, quantity: quantity }
+    }, {
+        new: true
+    }, function (err, updateMenu) {
+        if (err) {
+            res.status(403).send("Error updating product");
+        }
+        else {
+            res.json(updateMenu);
+        }
     });
 }
 //# sourceMappingURL=menu.helper.js.map

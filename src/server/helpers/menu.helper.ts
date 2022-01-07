@@ -20,7 +20,7 @@ export function menusByAdminId(req: any, res: any) {
 		.catch((err) => {
 			res.status(501).json({ error: err });
 		});
-}
+};
 
 export function addMenuByAdmin(req: any, res: any) {
 	const { name, imgUrl, description, price, quantity} = req.body;
@@ -55,6 +55,28 @@ export function addMenuByAdmin(req: any, res: any) {
 			return res.status(500);
 		});
     })
+};
 
+export function updateMenuByAdmin(req:any, res: any){
+    const menuId = req.params.menuId;
+    const {name, imgUrl, description, price, quantity} = req.body;
 
+    menuModel.findByIdAndUpdate(
+        menuId,
+        { 
+            $set: {name: name, imgUrl: imgUrl, description: description, price: price, quantity: quantity}
+        },
+        {
+            new: true
+        },
+
+        function (err, updateMenu){
+            if (err){
+                res.status(403).send("Error updating product")
+            }else {
+                res.json(updateMenu)
+            }
+        }
+        
+        )
 }
