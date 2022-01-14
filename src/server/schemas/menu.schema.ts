@@ -16,4 +16,4 @@ const menuSchema = new Schema<Menu>({
 });
 
 
-export const menuModel = model('Menu', menuSchema)
+export const menuModel = model<Menu>('Menu', menuSchema)

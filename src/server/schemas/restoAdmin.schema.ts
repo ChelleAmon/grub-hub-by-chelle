@@ -38,4 +38,4 @@ const restoAdminSchema = new Schema<RestoAdmin>({
 })
 
 
-export const RestoAdminModel = model('RestoAdmin', restoAdminSchema)
+export const RestoAdminModel = model<RestoAdmin>('RestoAdmin', restoAdminSchema)
