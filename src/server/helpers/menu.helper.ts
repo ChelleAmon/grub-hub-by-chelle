@@ -43,7 +43,6 @@ export function addMenuByAdmin(req: any, res: any) {
         menu
 		.save()
 		.then((data) => {
-            console.log(data, "Success")
             admindata!.inventories!.push(menu._id);
 
             admindata!.save()
@@ -76,7 +75,7 @@ export function updateMenuByAdmin(req:any, res: any){
             }else {
                 res.json(updateMenu)
             }
-        }
-        
-        )
-}
+        } 
+    )
+};
+

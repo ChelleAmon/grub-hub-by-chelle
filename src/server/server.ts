@@ -6,7 +6,7 @@ import http from 'http';
 import dotenv from "dotenv";
 import path from 'path';
 import { getRestoAdmin, loginRestoAdmin, postRestoAdmin } from "./routes/restoAdmin.routes.js";
-import { getMenusByAdminId, postMenu, updateMenu } from "./routes/menu.routes.js";
+import {  getMenusByAdminId, postMenu, updateMenu } from "./routes/menu.routes.js";
 
 dotenv.config();
 
