@@ -10,7 +10,6 @@ export function menusByAdminId(req, res) {
     })
         .then((data) => {
         res.json({ data });
-        console.log({ data });
     })
         .catch((err) => {
         res.status(501).json({ error: err });
@@ -41,7 +40,6 @@ export function addMenuByAdmin(req, res) {
                 .catch((err) => res.json("Error on user save: " + err));
         })
             .catch((err) => {
-            console.log(err, "menu failed");
             return res.status(500);
         });
     });

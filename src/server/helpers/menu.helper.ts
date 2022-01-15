@@ -15,7 +15,6 @@ export function menusByAdminId(req: any, res: any) {
         )
 		.then((data) => {
 			res.json({ data });
-            console.log({data})
 		})
 		.catch((err) => {
 			res.status(501).json({ error: err });
@@ -50,7 +49,6 @@ export function addMenuByAdmin(req: any, res: any) {
             .catch((err:any) => res.json("Error on user save: " + err))
 		})
 		.catch((err) => {
-            console.log(err,"menu failed")
 			return res.status(500);
 		});
     })
