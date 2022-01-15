@@ -33,8 +33,9 @@ const restoAdminSchema = new Schema<RestoAdmin>({
     restoName: {type: String, required: true}, 
     storeNumber: {type: String, required: true},
     adminInfo: adminInfoSchema,
-    timestamp: {type: Date}
+    timestamp: {type: Date},
+    inventories: [{type: mongoose.Types.ObjectId, ref: "Menu"}]
 })
 
 
-export const RestoAdminModel = model('RestoAdmin', restoAdminSchema)
+export const RestoAdminModel = model<RestoAdmin>('RestoAdmin', restoAdminSchema)
