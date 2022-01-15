@@ -89,5 +89,5 @@ export function deleteMenubyId (req: any, res: any){
             res.json(deleteMenu)
         }
     })
-}
+};
 

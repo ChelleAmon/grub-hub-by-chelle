@@ -73,4 +73,5 @@ export function deleteMenubyId(req, res) {
         }
     });
 }
+;
 //# sourceMappingURL=menu.helper.js.map
