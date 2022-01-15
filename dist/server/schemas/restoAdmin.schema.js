@@ -29,8 +29,7 @@ const restoAdminSchema = new Schema({
     restoName: { type: String, required: true },
     storeNumber: { type: String, required: true },
     adminInfo: adminInfoSchema,
-    timestamp: { type: Date },
-    inventories: [{ type: mongoose.Types.ObjectId, ref: "Menu" }]
+    timestamp: { type: Date }
 });
 export const RestoAdminModel = model('RestoAdmin', restoAdminSchema);
 //# sourceMappingURL=restoAdmin.schema.js.map

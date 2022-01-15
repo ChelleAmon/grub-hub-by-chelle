@@ -1,17 +1,22 @@
 import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+import cookieParser from "cookie-parser";
 import * as socketIO from "socket.io";
 import http from 'http';
 import dotenv from "dotenv";
 import path from 'path';
-import { getRestoAdmin, loginRestoAdmin, postRestoAdmin } from "./routes/restoAdmin.routes.js";
-import { getMenusByAdminId, postMenu } from "./routes/menu.routes.js";
+import { RestoAdminModel } from "./schemas/restoAdmin.schema.js";
+import { authHandler } from "./middleware/auth.middleware.js";
 dotenv.config();
 const __dirname = path.resolve();
 const app = express();
 const server = http.createServer(app);
 const clientPath = path.join(__dirname, '/dist/client');
+const saltRounds = 10;
+const access_token = process.env.ACCESS_TOKEN_SECRET;
 app.use(express.static(clientPath));
 const io = new socketIO.Server(server, { cors: {
         origin: '*'
@@ -24,16 +29,91 @@ mongoose
     console.log("Connected to DB Successfully");
 })
     .catch((err) => console.log("Failed to Connect to DB", err));
+app.use(cookieParser());
 app.use(cors({
     credentials: true,
     origin: ['http://localhost:3000', 'http://localhost:4200', 'http://localhost:3501', 'http://localhost:8080']
 }));
 app.use(express.json());
-app.use('/api/admin', getRestoAdmin);
-app.use('/api/admin', postRestoAdmin);
-app.use('/api/admin', loginRestoAdmin);
-app.use('/api/admin', getMenusByAdminId);
-app.use('/api/admin', postMenu);
+app.get("/api/test", function (req, res) {
+    res.json({ message: "Hello World!" });
+});
+app.get("/api/admin/RestoAdmin", authHandler, function (req, res) {
+    RestoAdminModel.find({}, "-password")
+        .then(data => {
+        res.json(data);
+    })
+        .catch(err => {
+        res.status(501).json({ error: err });
+    });
+});
+app.post("/api/admin/RestoAdmin", async function (req, res) {
+    const { restoName, storeNumber, firstName, lastName, email, password, isAdmin, timestamp } = req.body;
+    const isStoreNumberUnique = await RestoAdminModel.findOne({ storeNumber }).lean();
+    if (isStoreNumberUnique) {
+        res.status(302).send(`Found ${storeNumber} on file. Please check with your administrator for some assistance.`);
+    }
+    else if (restoName == "" || storeNumber == "" || firstName == "" || lastName == "" || email == "" || password == "") {
+        res.send('Fill up all required fields!');
+    }
+    else {
+        bcrypt.genSalt(saltRounds, function (err, salt) {
+            bcrypt.hash(password, salt, function (err, hash) {
+                const restoAdmin = new RestoAdminModel({
+                    restoName,
+                    storeNumber,
+                    isAdmin,
+                    timestamp: Date.now()
+                });
+                restoAdmin.adminInfo = {
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    password: hash,
+                    isAdmin: true
+                };
+                restoAdmin.save()
+                    .then(data => {
+                    res.json({ data });
+                })
+                    .catch(err => {
+                    if (err.name === "ValidationError") {
+                        let errors = {};
+                        Object.keys(err.errors).forEach((key) => {
+                            err[key] = err.errors[key].message;
+                            errors = (err[key]);
+                        });
+                        return res.status(400).send({ Error: errors });
+                    }
+                    res.status(500).json({ message: "Something went wrong" });
+                });
+            });
+        });
+    }
+});
+app.post("/api/admin/login", function (req, res, next) {
+    const { storeNumber, email, password } = req.body;
+    RestoAdminModel.findOne({ storeNumber: storeNumber, "adminInfo.email": email })
+        .then(admin => {
+        bcrypt.compare(password, `${admin?.adminInfo.password}`, function (err, result) {
+            if (result && admin?.adminInfo.isAdmin == true) {
+                const accessToken = jwt.sign({ admin }, access_token);
+                res.cookie('jwt', accessToken, {
+                    httpOnly: true,
+                    maxAge: 60 * 60 * 100,
+                    path: "/api/admin"
+                });
+                res.status(200).send({ message: "Successfully logged in" });
+            }
+            else {
+                res.status(403).send({ message: "Either Store number, email or password is incorrect" });
+            }
+        });
+    })
+        .catch(err => {
+        res.status(501).send({ Error: "Something went wrong" });
+    });
+});
 app.all("/api/*", function (req, res) {
     res.sendStatus(404);
 });
