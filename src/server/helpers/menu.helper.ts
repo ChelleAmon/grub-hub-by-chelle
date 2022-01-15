@@ -79,3 +79,17 @@ export function updateMenuByAdmin(req:any, res: any){
     )
 };
 
+export function deleteMenubyId (req: any, res: any){
+    const menuId = req.params.menuId;
+    
+    menuModel.findByIdAndUpdate(menuId, { $set: {isAvailable: false}}, {new: true},
+
+    function(err, deleteMenu){
+        if(err){
+            res.status(403).send("Cannot delete item. Try again.")
+        }else{
+            res.json(deleteMenu)
+        }
+    })
+}
+
