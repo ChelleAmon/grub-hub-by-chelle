@@ -1,4 +1,5 @@
-import { Date } from "mongoose";
+import * as mongoose from "mongoose";
+import { Menu } from "./menu.model.js";
 
 export interface RestoAdmin{
     restoName: string,
@@ -22,5 +23,6 @@ export interface RestoAdmin{
         password: string,
         isAdmin: boolean
     }
-    timestamp: Date
+    timestamp: mongoose.Date,
+    inventories?: [type:mongoose.Types.ObjectId | Menu ]
 }

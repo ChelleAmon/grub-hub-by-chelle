@@ -10,6 +10,7 @@ function authHandle(req: AuthRequest, res: Response, next: NextFunction) {
   jwt.verify(
     cookie,
     process.env.ACCESS_TOKEN_SECRET as string,
+    
     (err: any, result: any) => {
       if (err) {
         return res.sendStatus(403);
@@ -20,6 +21,7 @@ function authHandle(req: AuthRequest, res: Response, next: NextFunction) {
       next();
     }
   );
+
 }
 
 export const authHandler = authHandle;
