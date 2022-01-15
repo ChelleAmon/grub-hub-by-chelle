@@ -34,16 +34,44 @@ export function addMenuByAdmin(req, res) {
         menu
             .save()
             .then((data) => {
-            console.log(data, "Success");
             admindata.inventories.push(menu._id);
             admindata.save()
                 .then((resto) => res.status(200).json(resto))
                 .catch((err) => res.json("Error on user save: " + err));
         })
             .catch((err) => {
-            console.log(err, "menu failed");
             return res.status(500);
         });
     });
 }
+;
+export function updateMenuByAdmin(req, res) {
+    const menuId = req.params.menuId;
+    const { name, imgUrl, description, price, quantity } = req.body;
+    menuModel.findByIdAndUpdate(menuId, {
+        $set: { name: name, imgUrl: imgUrl, description: description, price: price, quantity: quantity }
+    }, {
+        new: true
+    }, function (err, updateMenu) {
+        if (err) {
+            res.status(403).send("Error updating product");
+        }
+        else {
+            res.json(updateMenu);
+        }
+    });
+}
+;
+export function deleteMenubyId(req, res) {
+    const menuId = req.params.menuId;
+    menuModel.findByIdAndUpdate(menuId, { $set: { isAvailable: false } }, { new: true }, function (err, deleteMenu) {
+        if (err) {
+            res.status(403).send("Cannot delete item. Try again.");
+        }
+        else {
+            res.json(deleteMenu);
+        }
+    });
+}
+;
 //# sourceMappingURL=menu.helper.js.map
