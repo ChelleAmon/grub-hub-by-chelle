@@ -7,15 +7,11 @@ interface AuthRequest extends Request {
 }
 function authHandle(req: AuthRequest, res: Response, next: NextFunction) {
   const cookie = req.cookies["jwt"];
-  console.log("auth", cookie)
   jwt.verify(
     cookie,
     process.env.ACCESS_TOKEN_SECRET as string,
-    
     (err: any, result: any) => {
-      console.log("Auth Result: ", result)
       if (err) {
-        console.log("Error", err)
         return res.sendStatus(403);
       }
       if (result) {
@@ -24,7 +20,6 @@ function authHandle(req: AuthRequest, res: Response, next: NextFunction) {
       next();
     }
   );
-
 }
 
 export const authHandler = authHandle;
