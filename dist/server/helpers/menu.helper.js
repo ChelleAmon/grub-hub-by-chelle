@@ -10,12 +10,12 @@ export function menusByAdminId(req, res) {
     })
         .then((data) => {
         res.json({ data });
+        console.log({ data });
     })
         .catch((err) => {
         res.status(501).json({ error: err });
     });
 }
-;
 export function addMenuByAdmin(req, res) {
     const { name, imgUrl, description, price, quantity } = req.body;
     const admin = req.params.adminId;

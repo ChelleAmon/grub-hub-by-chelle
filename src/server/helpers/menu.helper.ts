@@ -15,11 +15,12 @@ export function menusByAdminId(req: any, res: any) {
         )
 		.then((data) => {
 			res.json({ data });
+            console.log({data})
 		})
 		.catch((err) => {
 			res.status(501).json({ error: err });
 		});
-};
+}
 
 export function addMenuByAdmin(req: any, res: any) {
 	const { name, imgUrl, description, price, quantity} = req.body;
@@ -58,6 +59,7 @@ export function updateMenuByAdmin(req:any, res: any){
     const menuId = req.params.menuId;
     const {name, imgUrl, description, price, quantity} = req.body;
 
+
     menuModel.findByIdAndUpdate(
         menuId,
         { 
@@ -90,7 +92,4 @@ export function deleteMenubyId (req: any, res: any){
         }
     })
 };
-
-
-
 

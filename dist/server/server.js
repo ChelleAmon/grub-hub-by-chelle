@@ -6,7 +6,7 @@ import http from 'http';
 import dotenv from "dotenv";
 import path from 'path';
 import { getRestoAdmin, loginRestoAdmin, postRestoAdmin } from "./routes/restoAdmin.routes.js";
-import { deleteMenu, getMenusByAdminId, postMenu, updateMenu } from "./routes/menu.routes.js";
+import { getMenusByAdminId, postMenu } from "./routes/menu.routes.js";
 dotenv.config();
 const __dirname = path.resolve();
 const app = express();
@@ -34,8 +34,6 @@ app.use('/api/admin', postRestoAdmin);
 app.use('/api/admin', loginRestoAdmin);
 app.use('/api/admin', getMenusByAdminId);
 app.use('/api/admin', postMenu);
-app.use('/api/admin', updateMenu);
-app.use('/api/admin', deleteMenu);
 app.all("/api/*", function (req, res) {
     res.sendStatus(404);
 });
